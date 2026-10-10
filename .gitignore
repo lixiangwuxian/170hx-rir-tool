@@ -1,0 +1,7 @@
+ga100_rir
+*.o
+rir_backup_*.txt
+__pycache__/
+*.png
+GUIDE.md
+RIR-SIZE-FINDINGS.md
