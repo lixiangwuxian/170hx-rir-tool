@@ -3,7 +3,7 @@
 [English](README.md)
 
 GA100 (Ampere) GPU 的 RIR (Redundancy Information Rows) 读写独立工具。
-读取路径与 SW Override 已在 CMP 170HX 上实测可用。RIR 写入能落地、
+读取路径已在 CMP 170HX 上实测可用。RIR 写入能落地、
 能跨冷启动保存。此前"gate 不变"是因为编码 bug（scrambled → 线性已修正），
 正确载荷尚未实测。
 

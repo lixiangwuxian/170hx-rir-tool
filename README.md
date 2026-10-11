@@ -3,7 +3,7 @@
 [简体中文](README.zh-CN.md)
 
 Standalone tool for reading/writing RIR (Redundancy Information Rows) on GA100 (Ampere) GPUs.
-Read paths and SW Override are verified working on CMP 170HX. RIR writes land and
+Read paths are verified working on CMP 170HX. RIR writes land and
 persist across cold boot. Previous "gate stayed locked" result was caused by a
 scrambled-vs-linear encoding bug (now fixed); the correct payload has not been tested yet.
 
