@@ -879,7 +879,7 @@ static void usage(const char *prog)
     printf("  sudo %s 0000:41:00.0 --sw-write ecc 1         # enable ECC\n", prog);
     printf("  sudo %s 0000:41:00.0 --sw-write gpc 0         # unlock all GPC/SM\n", prog);
     printf("  sudo %s 0000:41:00.0 --sw-write fbp 0         # unlock all HBM\n", prog);
-    printf("  sudo %s 0000:41:00.0 --write-rir 0 0x15011401           # unlock SW override\n", prog);
+    printf("  sudo %s 0000:41:00.0 --write-rir 0 0x00950015           # unlock SW override\n", prog);
     printf("\n");
     printf("Prerequisite: unbind NVIDIA driver first:\n");
     printf("  echo <bdf> > /sys/bus/pci/devices/<bdf>/driver/unbind\n");
