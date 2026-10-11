@@ -1,0 +1,30 @@
+README.zh-CN.md
+  s_b67cf3582fe4f9::t_b7cbbf2cfc3059 48
+  s_b67cf3582fe4f9::t_58459508851841 61-62
+  s_b67cf3582fe4f9::t_991dafbb611a47 6-8
+  s_b67cf3582fe4f9::t_72f699023befd6 110
+  s_b67cf3582fe4f9::t_093fda44342103 118-124
+  s_b67cf3582fe4f9::t_c67e7178bf6fec 77-80
+README.md
+  s_b67cf3582fe4f9::t_1a63548805f486 50
+  s_b67cf3582fe4f9::t_f2c4d8626db24f 127-128
+  s_b67cf3582fe4f9::t_b8d5ab3da31acf 6-8,63-64,80,82,112,121-126
+ga100_rir.c
+  s_b67cf3582fe4f9::t_bd640f712fecbf 31,396-397,400-404,412-413
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d4bc663ae47b6bbcf273f6b8d15bb67ae591d9f",
+  "prompts": {},
+  "sessions": {
+    "s_b67cf3582fe4f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83ddf301-00e4-4d51-9e14-f18c97e6679a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": null
+    }
+  }
+}
