@@ -1,0 +1,26 @@
+ga100_rir.c
+  s_b67cf3582fe4f9::t_c655594f075a8a 396-397,400-404
+  s_b67cf3582fe4f9::t_2cf56380a104da 412-413
+README.md
+  s_b67cf3582fe4f9::t_4cca98ef430bf0 80,82
+  s_b67cf3582fe4f9::t_0a5907ed4388b1 63-64
+  s_b67cf3582fe4f9::t_d04073ed1321fd 112
+  s_b67cf3582fe4f9::t_1a695cbcb9a72a 121-126
+  s_b67cf3582fe4f9::t_08d5fa1fe33eb4 6-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5dd2cd8c0c11d333eb85d2b133b22bcfc2643fbf",
+  "prompts": {},
+  "sessions": {
+    "s_b67cf3582fe4f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83ddf301-00e4-4d51-9e14-f18c97e6679a",
+        "model": "unknown"
+      },
+      "human_author": "lixiangwuxian <lixiangwuxian@lxtend.com>"
+    }
+  }
+}
