@@ -1,0 +1,21 @@
+README.zh-CN.md
+  s_b67cf3582fe4f9::t_e55d496c3aeb6c 6
+README.md
+  s_b67cf3582fe4f9::t_7aa85cfaada909 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "382eca1d7993300491b087edf67b642db2cccfde",
+  "prompts": {},
+  "sessions": {
+    "s_b67cf3582fe4f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83ddf301-00e4-4d51-9e14-f18c97e6679a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "lixiangwuxian <lixiangwuxian@lxtend.com>"
+    }
+  }
+}
