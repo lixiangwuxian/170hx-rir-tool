@@ -28,7 +28,7 @@
 #include <sys/time.h>
 
 /* ========================================================================
- * Register map for GA100 (from dev_fuse.h)
+ * Register map for GA100
  * ======================================================================== */
 
 /* --- Fuse control (base 0x820xxx on GA100) --- */
@@ -393,16 +393,15 @@ static void cmd_status(gpu_ctx_t *ctx)
  * ======================================================================== */
 static uint16_t rir_encode(uint32_t abs_bit, int data_val)
 {
-    if (abs_bit > 0x1FFF) {
-        fprintf(stderr, "ERROR: bit address 0x%X > 13-bit max\n", abs_bit);
+    if (abs_bit > 0x3FFF) {
+        fprintf(stderr, "ERROR: bit address 0x%X > 14-bit max (512 rows x 32)\n", abs_bit);
         return 0;
     }
-    uint16_t r = 1; /* enable */
-    r |= (data_val ? 1 : 0) << 1;
-    r |= ((abs_bit >> 7) & 0x3F) << 2;
-    r |= ((abs_bit >> 5) & 0x03) << 8;
-    r |= ((abs_bit >> 0) & 0x1F) << 10;
-    return r;
+    /* GA100 RIR record is LINEAR: [0]en [1]data [15:2]addr(14-bit).
+     * Verified by three-card cross-reference (ga100-fuse-re + local 2082 dump):
+     * factory record 0x0923 decodes to row18:bit8, matching observed
+     * row18/row19 twin difference. See lixiangwuxian/170hx-rir-tool#1. */
+    return (uint16_t)((abs_bit << 2) | ((data_val ? 1u : 0u) << 1) | 1u);
 }
 
 static void rir_decode(uint16_t rec, uint32_t *abs_bit, int *data,
@@ -410,10 +409,8 @@ static void rir_decode(uint16_t rec, uint32_t *abs_bit, int *data,
 {
     *enabled  = rec & 1;
     *data     = (rec >> 1) & 1;
-    *disabled = (rec >> 15) & 1;
-    *abs_bit  = ((rec >> 10) & 0x1F)
-              | (((rec >> 8)  & 0x03) << 5)
-              | (((rec >> 2)  & 0x3F) << 7);
+    *disabled = 0; /* GA100 has no disable bit; bit15 is addr[13] */
+    *abs_bit  = (rec >> 2) & 0x3FFF;
 }
 
 /* ========================================================================

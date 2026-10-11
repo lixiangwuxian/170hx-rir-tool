@@ -3,8 +3,9 @@
 [简体中文](README.zh-CN.md)
 
 Standalone tool for reading/writing RIR (Redundancy Information Rows) on GA100 (Ampere) GPUs.
-Read paths and SW Override are verified working on CMP 170HX. **RIR writes land and
-persist across cold boot, but have NOT been proven to change any functional state.**
+Read paths and SW Override are verified working on CMP 170HX. RIR writes land and
+persist across cold boot. Previous "gate stayed locked" result was caused by a
+scrambled-vs-linear encoding bug (now fixed); the correct payload has not been tested yet.
 
 > **⚠ This project was built almost entirely through AI-assisted
 > "vibe coding" — including this README. The code has been validated
@@ -46,7 +47,7 @@ echo 0000:41:00.0 > /sys/bus/pci/devices/0000:41:00.0/driver/unbind
 # 1. Check current state (read-only, safe)
 sudo ./ga100_rir 0000:41:00.0
 
-# 2. Volatile unlocks (safe, lost on reboot) — these DO work:
+# 2. Volatile unlocks (safe, lost on reboot) — require gate=0:
 sudo ./ga100_rir 0000:41:00.0 --sw-enable                  # needs gate already open
 sudo ./ga100_rir 0000:41:00.0 --sw-write gen3 0            # Unlock PCIe Gen3/Gen4
 sudo ./ga100_rir 0000:41:00.0 --sw-write nvlink 0          # Unlock NVLink
@@ -59,9 +60,8 @@ lspci -vvv -s 41:00.0 | grep -i speed
 ```
 
 `--sw-enable` only works on cards whose `disable_sw_override` gate is
-already open (`--status` shows `fuse : 0`). On gate-locked cards the
-historical RIR route below was tried and **did not open the gate**;
-it is documented, not recommended.
+already open (`--status` shows `fuse : 0`). On gate-locked cards, use
+`--write-rir <row> 0x00950015` to clear the gate fuse via RIR (irreversible).
 
 ## All Commands
 
@@ -77,9 +77,9 @@ sudo ./ga100_rir <bdf> --encode-rir 5               # Encode for bit 5 (disable_
 sudo ./ga100_rir <bdf> --encode-rir 37              # Encode for bit 37 (disable_sw_override RED)
 
 # === RIR write (IRREVERSIBLE, effect on gate UNPROVEN) ===
-sudo ./ga100_rir 0000:41:00.0 --write-rir 0 0x15011401     # disable_sw_override PRI+RED records (but this did not unlock my 170hx 10g fuse at all😭)
+sudo ./ga100_rir 0000:41:00.0 --write-rir 0 0x00950015     # disable_sw_override PRI+RED (linear encoding)
 # No external hardware is needed on 170HX (measured). The burn
-# lands and survives cold boot, but never opened the gate.
+# lands and survives cold boot. Correct payload not yet tested.
 
 # === SW Override (volatile, lost on reboot) ===
 sudo ./ga100_rir <bdf> --sw-enable                  # Activate SW override
@@ -109,7 +109,7 @@ Bit | Fuse Name               | Abs bit (PRI/RED)
 ## Safety
 
 - **RIR writes are permanent** — only 8 rows or 16 slots, no undo
-- **RIR write effect is UNPROVEN** — records persist across cold boot but the gate stayed locked on every card tested; do not burn slots expecting an unlock
+- **RIR write with correct encoding not yet tested** — previous "gate locked" result was due to encoding bug (scrambled vs linear); correct payload 0x00950015 is pending test
 - **SW Override is volatile** — safe for testing, lost on reboot
 - Automatic backups + two-step confirmation on every RIR write
 - Always `--dump-rir` before writing to check for empty slots
@@ -118,11 +118,13 @@ Bit | Fuse Name               | Abs bit (PRI/RED)
 
 - The fuse programming path works: writes land, read back correctly,
   survive a power-off cold boot.
-- `DISABLE_SW_OVERRIDE_STATUS` remained 1 after cold boot on every
-  burned card — bit-identical to an unwritten card.
-- Two explanations remain open: (a) the record layout/encoding does
-  not match what the hardware applies, or (b) GA100 does not apply
-  RIR corrections to security-latch fuses at all. Neither has been
-  refuted yet.
+- `DISABLE_SW_OVERRIDE_STATUS` remained 1 after the old (incorrect)
+  write — now explained: the scrambled encoding produced a no-op
+  targeting row40:bit0 and row42:bit0 (already 0). See issue #1.
+- Encoding fixed to GA100 linear layout. Correct payload 0x00950015
+  targets the verified fuse bits (Row0:5 PRI + Row1:5 RED).
+  Effect pending test.
+- SW Override path (`--sw-enable` / `--sw-write`) has not been tested
+  on real hardware — no card with gate=0 is available yet.
 - RIR size measured: 8 rows × 32-bit (16 slots), not the 4 rows
   hardcoded in NVIDIA's Maxwell-era MODS tooling.
