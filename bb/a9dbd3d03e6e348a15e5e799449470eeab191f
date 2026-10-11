@@ -1,0 +1,19 @@
+ga100_rir.c
+  s_b67cf3582fe4f9::t_d3654321f9d222 882
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bba9dbd3d03e6e348a15e5e799449470eeab191f",
+  "prompts": {},
+  "sessions": {
+    "s_b67cf3582fe4f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83ddf301-00e4-4d51-9e14-f18c97e6679a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "lixiangwuxian <lixiangwuxian@lxtend.com>"
+    }
+  }
+}
