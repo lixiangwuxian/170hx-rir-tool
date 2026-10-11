@@ -1,0 +1,21 @@
+README.md
+  s_b67cf3582fe4f9::t_b8d5ab3da31acf 6-8,63-64,80,82,112,121-126
+ga100_rir.c
+  s_b67cf3582fe4f9::t_bd640f712fecbf 31,396-397,400-404,412-413
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cf95e8f6dd809f65c6d9ad38c32795f9b10180a9",
+  "prompts": {},
+  "sessions": {
+    "s_b67cf3582fe4f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83ddf301-00e4-4d51-9e14-f18c97e6679a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "lixiangwuxian <lixiangwuxian@lxtend.com>"
+    }
+  }
+}
