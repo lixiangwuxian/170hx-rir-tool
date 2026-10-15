@@ -4,17 +4,23 @@
 
 Standalone tool for reading/writing RIR (Redundancy Information Rows) on GA100 (Ampere) GPUs.
 Read paths are verified working on CMP 170HX. RIR writes land and
-persist across cold boot. Previous "gate stayed locked" result was caused by a
-scrambled-vs-linear encoding bug (now fixed); the correct payload has not been tested yet.
+persist across cold boot. Writing `0x00950015` to the RIR region has been
+verified to unlock the `disable_sw_override` fuse bit.
 
 > **⚠ This project was built almost entirely through AI-assisted
 > "vibe coding" — including this README. The code has been validated
 > only by the measurements summarized at the bottom of this file.**
 >
+> **This README has been through one round of manual proofreading and
+> should now reflect the actual situation fairly accurately.**
+>
 > **Review the source yourself, especially the write paths
 > (`cmd_write_rir`), before running anything against hardware: RIR
 > burns are irreversible and a bug here can cost you a slot or a
 > card.**
+>
+> **If you don't know or don't understand what this tool does, you
+> should not use it to do anything!**
 
 ## Build
 
@@ -41,6 +47,9 @@ lspci -D | grep NVIDIA
 echo 0000:41:00.0 > /sys/bus/pci/devices/0000:41:00.0/driver/unbind
 ```
 
+Writes should not need an unbind either. If you do run into problems,
+though, you can try unbinding and running the command again.
+
 ## Quick Start
 
 ```bash
@@ -49,9 +58,9 @@ sudo ./ga100_rir 0000:41:00.0
 
 # 2. Volatile unlocks (safe, lost on reboot) — require gate=0:
 sudo ./ga100_rir 0000:41:00.0 --sw-enable                  # needs gate already open
-sudo ./ga100_rir 0000:41:00.0 --sw-write gen3 0            # Unlock PCIe Gen3/Gen4
-sudo ./ga100_rir 0000:41:00.0 --sw-write nvlink 0          # Unlock NVLink
-sudo ./ga100_rir 0000:41:00.0 --sw-write ecc 1             # Enable ECC
+sudo ./ga100_rir 0000:41:00.0 --sw-write gen3 0            # Unlock PCIe Gen3/Gen4 fuse bits
+sudo ./ga100_rir 0000:41:00.0 --sw-write nvlink 0          # Unlock NVLink fuse bits
+sudo ./ga100_rir 0000:41:00.0 --sw-write ecc 1             # Enable ECC fuse bit
 
 # 3. Rebind driver and test
 echo 0000:41:00.0 > /sys/bus/pci/drivers/nvidia/bind
@@ -76,16 +85,18 @@ sudo ./ga100_rir <bdf> --dump-fuses 128             # Raw fuse rows
 sudo ./ga100_rir <bdf> --encode-rir 5               # Encode for bit 5 (disable_sw_override PRI)
 sudo ./ga100_rir <bdf> --encode-rir 37              # Encode for bit 37 (disable_sw_override RED)
 
-# === RIR write (IRREVERSIBLE, effect on gate UNPROVEN) ===
+# === RIR write (IRREVERSIBLE) ===
 sudo ./ga100_rir 0000:41:00.0 --write-rir 0 0x00950015     # disable_sw_override PRI+RED (linear encoding)
-# No external hardware is needed on 170HX (measured). The burn
-# lands and survives cold boot. Correct payload not yet tested.
+# No external hardware is needed on 170HX (measured). The burn takes
+# permanent effect after a reboot.
+# Do not write to any RIR row that already holds data unless explicit
+# bitwise calculation shows the overwrite is feasible.
 
 # === SW Override (volatile, lost on reboot) ===
 sudo ./ga100_rir <bdf> --sw-enable                  # Activate SW override
-sudo ./ga100_rir <bdf> --sw-write gen3 0            # Unlock PCIe Gen3
-sudo ./ga100_rir <bdf> --sw-write nvlink 0          # Unlock NVLink (0=all enabled)
-sudo ./ga100_rir <bdf> --sw-write ecc 1             # Enable ECC
+sudo ./ga100_rir <bdf> --sw-write gen3 0            # Unlock PCIe Gen3 fuse bits
+sudo ./ga100_rir <bdf> --sw-write nvlink 0          # Unlock NVLink fuse bits (0=all enabled)
+sudo ./ga100_rir <bdf> --sw-write ecc 1             # Enable ECC fuse bit
 sudo ./ga100_rir <bdf> --sw-write gpc <mask>        # GPC disable mask
 sudo ./ga100_rir <bdf> --sw-write fbp <mask>        # FBP disable mask
 sudo ./ga100_rir <bdf> --sw-write fbpa <mask>       # FBPA disable mask
@@ -109,12 +120,11 @@ Bit | Fuse Name               | Abs bit (PRI/RED)
 ## Safety
 
 - **RIR writes are permanent** — only 8 rows or 16 slots, no undo
-- **RIR write with correct encoding not yet tested** — previous "gate locked" result was due to encoding bug (scrambled vs linear); correct payload 0x00950015 is pending test
 - **SW Override is volatile** — safe for testing, lost on reboot
 - Automatic backups + two-step confirmation on every RIR write
 - Always `--dump-rir` before writing to check for empty slots
 
-## Measurement status (summary)
+## Measurement status
 
 - The fuse programming path works: writes land, read back correctly,
   survive a power-off cold boot.
@@ -123,8 +133,13 @@ Bit | Fuse Name               | Abs bit (PRI/RED)
   targeting row40:bit0 and row42:bit0 (already 0). See issue #1.
 - Encoding fixed to GA100 linear layout. Correct payload 0x00950015
   targets the verified fuse bits (Row0:5 PRI + Row1:5 RED).
-  Effect pending test.
-- SW Override path (`--sw-enable` / `--sw-write`) has not been tested
-  on real hardware — no card with gate=0 is available yet.
-- RIR size measured: 8 rows × 32-bit (16 slots), not the 4 rows
-  hardcoded in NVIDIA's Maxwell-era MODS tooling.
+  Effect verified.
+- SW Override path (`--sw-enable` / `--sw-write`) has been tested on
+  real hardware and correctly overrides fuse values.
+- Overriding existing fuse bits alone is usually not enough to unlock a
+  feature right away; most features also need some driver-side changes
+  to work.
+- Some features may be restricted by more than just fuses, so soft fuse
+  overrides plus software tweaks cannot guarantee that every feature
+  gets fully unlocked.
+- RIR size measured: 8 rows × 32-bit (16 slots).
