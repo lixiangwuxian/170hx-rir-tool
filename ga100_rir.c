@@ -276,7 +276,7 @@ static void cmd_status(gpu_ctx_t *ctx)
      * Site F = FBP 10,11 (FBPA 20-23)
      */
     static const char *site_names[] = {"A", "B", "C", "D", "E", "F"};
-    printf("\nHBM Stack / Site Status:\n");
+    printf("\nHBM Stack / Site Status:(Actually this is not reliable and I don't know how GA100 HBM site mapping)\n");
     printf("  Site | FBPs    | FBP Mask   | FBPAs      | FBPA Mask  | Status\n");
     printf("  -----+---------+------------+------------+------------+--------\n");
 
