@@ -473,7 +473,7 @@ static int cmd_dump_rir(gpu_ctx_t *ctx)
                    slot, rec, en, dis, data, ab, ab/32, ab%32, note);
         }
     }
-    printf("\n  %d/8 slots in use, %d free.\n", used, 8 - used);
+    printf("\n  %d/%d slots in use, %d free.\n", used, NUM_RIR_ROWS, NUM_RIR_ROWS * 2 - used);
     return 0;
 }
 
