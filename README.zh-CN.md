@@ -29,6 +29,7 @@ gcc -O2 -o ga100_rir ga100_rir.c
 
 1. 已安装该 GPU 的 Linux 系统
 2. root 权限 (sudo)
+3. 在内核启动参数里面添加 `iomem=relaxed`
 
 读取**不需要**解绑 NVIDIA 驱动(实测:`--status` / `--dump-rir` / `--dump-fuses` 在驱动加载状态下均可用)。只有当命令报 DEBUGCTRL RWL 位无法置位(即驱动占着 fuse 块访问权)时才需要解绑:
 

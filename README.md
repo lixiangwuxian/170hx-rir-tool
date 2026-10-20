@@ -34,6 +34,7 @@ gcc -O2 -o ga100_rir ga100_rir.c
 
 1. Linux system with the GPU installed
 2. Root access (sudo)
+3. Add `iomem=relaxed` to your kernel command line
 
 Unbinding the NVIDIA driver is **not required for reads** (measured:
 `--status` / `--dump-rir` / `--dump-fuses` all work with the driver
