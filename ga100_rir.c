@@ -717,6 +717,7 @@ static int cmd_write_rir(gpu_ctx_t *ctx, uint32_t row, uint32_t value)
         fprintf(stderr, "  Slot %d: 0x%04X (must be 0x0000 or match 0x%04X)\n",
                 row*2+1, cur_hi, req_hi);
         fprintf(stderr, "  Merging into non-blank slots would create incorrect records.\n");
+        fprintf(stderr, "  If you REALLY want to do this, comment out 713-722 lines in ga100_rir.c and rebuild to continue\n");
         return -1;
     }
 
